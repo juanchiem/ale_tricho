@@ -1,11 +1,13 @@
-project:
+project: 
   type: website
   output-dir: docs
-  
+
+execute: 
+  echo: false
+  warning: false
+  message: false
 
 format:
   html:
+    theme: bootstrap
     toc: true
-    toc-depth: 5
-    theme: 
-      light: journal
