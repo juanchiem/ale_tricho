@@ -1,6 +1,5 @@
 ---
 title: "Hormonas tricho"
-date: '`r paste("Actualizado en", Sys.Date())`'
 ---
 
 ```{r setup, echo=FALSE, warning = FALSE, message = FALSE}

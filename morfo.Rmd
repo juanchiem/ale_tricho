@@ -75,6 +75,8 @@ number_format(rhiz_morfo_tab)[, -1] <- fmt_pretty()
 rhiz_morfo_tab
 ```
 
+- Biplot 
+
 ```{r, results='hide', fig.cap="biplot_rhiz_morfo"}
 rhiz_morfo_pca <- PCA(rhiz_morfo, scale.unit=TRUE, ncp=5, graph=F)
 biplot_rhiz_morfo <- fviz_pca_biplot(
@@ -86,7 +88,6 @@ biplot_rhiz_morfo <- fviz_pca_biplot(
 biplot_rhiz_morfo
 ```
 
-- Biplot 
 
 ```{r, eval=FALSE}
 biplot_rhiz_morfo %>% 

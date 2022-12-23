@@ -8,5 +8,4 @@ format:
     toc: true
     toc-depth: 5
     theme: 
-      light: cosmo
-      dark: superhero
+      light: journal
