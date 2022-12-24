@@ -70,3 +70,9 @@ load("data/raw.rds")
 # save(raw, file = "data/raw.rds")
 # raw %>% 
 #   arrange(-ABA) %>% data.frame %>% head
+
+# chunks names
+# library(namer)
+# name_chunks(here::here("index.qmd"))
+# name_chunks(here::here("morfo.qmd"))
+

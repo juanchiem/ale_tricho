@@ -7,14 +7,13 @@ website:
   title: "Cap. efecto de trichoderma x rhizoctonia en papa"
   site-url: "https://juanchiem.github.io/ale_tricho/" 
   repo-url: https://github.com/juanchiem/ale_tricho 
-  repo-actions: [edit, issue]
   
   sidebar:
     pinned: true
     align: center
     tools: 
       - icon: database
-        href: https://docs.google.com/spreadsheets/d/1Qz-2UoqgL7Tiuz_04sY0tEdMdLqAzqr7QOg2Gg9jK_c/edit?usp=sharing
+        href: https://docs.google.com/spreadsheets/d/1Qz-2UoqgL7Tiuz_04sY0tEdMdLqAzqr7QOg2Gg9jK_c/edit?usp=sharing        
         text: "Data"
       - icon: github
         href: https://github.com/openscapes/quarto-website-tutorial
@@ -24,8 +23,8 @@ website:
         text: "Figuras"         
 
     style: "docked"
-    search: true
-    collapse-level: 1
+    search: false
+    collapse-level: 4
     contents:
       - href: index.qmd
         text: Hormonas

@@ -11,7 +11,7 @@ source(here::here("setup.R"))
 
 ## Comparacion entre ensayos
 
-```{r, fig.cap="horm_vitro.jpg", fig.height = 3, fig.width =5 }
+```{r index-1, fig.cap="horm_vitro.jpg", fig.height = 3, fig.width =5 }
 p1 <- raw %>% 
   filter(tipo == "vitro") %>% 
   select(!contains("_"), -rep, -cepa) %>%
@@ -30,13 +30,13 @@ p1 <- raw %>%
 p1
 ```
 
-```{r, eval=FALSE}
+```{r index-2, eval=FALSE}
 p1 %>% 
   ggsave(filename = "plots/horm_vitro.jpg", 
        width = 4, height = 2.5, scale=1.5, dpi = 600)
 ```
 
-```{r, eval=FALSE}
+```{r index-3, eval=FALSE}
 p2 <- raw %>% 
   filter(!tipo =="vitro") %>% 
   select(!contains("_"), -rep, -cepa, -KIN) %>%
@@ -68,7 +68,7 @@ p2 <- raw %>%
 p2
 ```
 
-```{r, eval=FALSE}
+```{r index-4, eval=FALSE}
 p2 %>% 
   ggsave(filename = "plots/horm_vivo.jpg", 
        width = 6.5, height = 2.5, scale=1.5, dpi = 600)
@@ -81,9 +81,9 @@ Con el fin de comparar estadisticamente la producion de hormonas a traves de las
     H0: las medianas de la población son iguales.
     H1: las medianas de la población no son iguales. 
 
--   ABA
+###   ABA
 
-```{r}
+```{r index-5}
 raw %>% 
   unite(tipo, tipo, rhizo, tricho) %>%
   filter(str_detect(tipo, "vivo")) %>%
@@ -93,7 +93,7 @@ raw %>%
   filter(ABA<100000) -> aba_dat
 ```
 
-```{r}
+```{r index-6}
 krus_aba <- kruskal(aba_dat$ABA, aba_dat$tipo, group=TRUE, p.adj="bonferroni")
 krus_aba
 
@@ -101,16 +101,21 @@ krus_aba$groups %>%
   rownames_to_column("tipo") %>% 
   left_join(aba_dat %>% 
               group_by(tipo) %>% 
-              summarise(median(ABA)))
+              summarise(median(ABA))) %>% 
+  select(tipo, mediana=`median(ABA)`, groups) %>% 
+  as_hux() %>% 
+  theme_compact() -> krus_aba_tab
+number_format(krus_aba_tab)[,] <- fmt_pretty()
+krus_aba_tab
 ```
 
 > La produccion de ABA vario con las condiciones experimentales (P= 0.0000025) \[o bien (P \< 0.001)\].
 
 > Las plantas de papa sintetizaron mayor cantidad de ABA cuando fueron infectadas con Rhizoctonia y no hubo diferencia entre el testigo absoluto y las plantas inoculadas con trichoderma spp.
 
--   AG3
+### AG3
 
-```{r}
+```{r index-7}
 raw %>% 
   unite(tipo, tipo, tricho, rhizo) %>%
   filter(str_detect(tipo, "vivo")) %>%
@@ -124,7 +129,7 @@ raw %>%
 #     skimr::skim(AG3)  
 ```
 
-```{r}
+```{r index-8}
 krus_ag3 <- kruskal(ag_dat$AG3, ag_dat$tipo, group=TRUE, p.adj="bonferroni")
 
 krus_ag3
@@ -136,9 +141,9 @@ krus_ag3$groups %>%
                summarise(median(AG3))))
 ```
 
--   AIA
+### AIA
 
-```{r}
+```{r index-9}
 raw %>% 
   unite(tipo, tipo, tricho, rhizo) %>%
   filter(str_detect(tipo, "vivo")) %>%
@@ -149,20 +154,26 @@ raw %>%
 #     skimr::skim(AIA)  
 ```
 
-```{r}
+```{r index-10}
 krus_aia <- kruskal(aia_dat$AIA, aia_dat$tipo, group=TRUE, p.adj="bonferroni")
+
 krus_aia
 
 krus_aia$groups %>% 
   rownames_to_column("tipo") %>% 
   left_join((aia_dat %>% 
                group_by(tipo) %>% 
-               summarise(median(AIA))))
+               summarise(median(AIA)))) %>% 
+  select(tipo, mediana=`median(AIA)`, groups) %>% 
+  as_hux() %>% 
+  theme_compact() -> krus_aia_tab
+number_format(krus_aia_tab)[,] <- fmt_pretty()
+krus_aia_tab
 ```
 
--   SA
+### SA
 
-```{r}
+```{r index-11}
 raw %>% 
   unite(tipo, tipo, rhizo, tricho) %>%
   filter(str_detect(tipo, "vivo")) %>%
@@ -173,7 +184,7 @@ raw %>%
 #   skimr::skim(SA) 
 ```
 
-```{r}
+```{r index-12}
 krus_sa <- kruskal(sa_dat$SA, sa_dat$tipo, group=TRUE, p.adj="bonferroni")
 
 krus_sa
@@ -182,31 +193,17 @@ krus_sa$groups %>%
   rownames_to_column("tipo") %>% 
   left_join((sa_dat %>% 
                group_by(tipo) %>% 
-               summarise(median(SA))))
+               summarise(median(SA)))) %>% 
+    select(tipo, mediana=`median(SA)`, groups) %>% 
+  as_hux() %>% 
+  theme_compact() -> krus_sa_tab
+number_format(krus_sa_tab)[,] <- fmt_pretty()
+krus_sa_tab
 ```
 
-```{r, eval=FALSE}
-raw %>% 
-  select(-rep) %>% 
-  filter(!tipo %in% c("vitro")) %>% 
-  filter(!str_detect(cepa, "test")) %>% 
-  # count(tipo)
-  group_by(tricho, rhizo) %>% 
-  # summarise_at(vars(!contains("_")), 
-  #              list(Q1=~quantile(.,probs = 0.25),
-  #                   median=median, Q3=~quantile(., probs = 0.75)), na.rm = TRUE) %>% 
-  as_hux() %>%
-  set_bottom_border(1, everywhere)    %>%
-  set_lr_padding(10)                  %>%
-  set_width(0.25) -> horm_tab
+## Comparacion entre cepas
 
-number_format(horm_tab)[, 6:15] <- 1 
-horm_tab 
-```
-
-## Perfil Hormonal de las cepas
-
-```{r, eval=FALSE}
+```{r index-13, eval=FALSE}
 p3 <- raw %>% 
   # count(cepa) %>%  data.frame
   select(tipo, tricho, rhizo, cepa, AIA, ABA, AG3, SA, JA) %>% 
@@ -238,7 +235,7 @@ p3 <- raw %>%
 shift_legend2(p3)
 ```
 
-```{r, eval=FALSE}
+```{r index-14, eval=FALSE}
 jpeg("plots/horm_cepas.jpg", width = 5.5, height = 11,units = "in", res=300)
 shift_legend2(p3) 
 dev.off()
@@ -248,7 +245,9 @@ dev.off()
 
 ### In vitro
 
-```{r, eval=T}
+Produccion de hormonas de cada cepa (valor mediano)
+
+```{r index-15, eval=T}
 raw %>% 
   filter(tipo == "vitro") %>% 
   column_to_rownames(var = "cepa") %>% 
@@ -259,10 +258,9 @@ vitro %>%
   rownames_to_column("cepa") %>% 
   as_hux() %>% 
   set_font_size(9) %>%  
-  theme_article() -> vito_tab
-number_format(vito_tab)[, -1] <- 1 
-number_format(vito_tab)[, -1] <- fmt_pretty()
-vito_tab 
+  theme_compact() -> vitro_tab
+number_format(vitro_tab)[, -1] <- fmt_pretty()
+vitro_tab 
 # raw %>% 
 #   filter(tipo == "vivo") %>% 
 #   column_to_rownames(var = "cepa") %>% 
@@ -273,9 +271,30 @@ vito_tab
 
 #### Multivar
 
--   Dendrograma
+-   Biplot
 
-```{r, eval=FALSE}
+```{r index-16, eval=FALSE}
+vitro.pca <- PCA(vitro, scale.unit=TRUE, ncp=5, graph=F)
+biplot_vitro <- fviz_pca_biplot(
+  vitro.pca, repel = TRUE,
+  col.var = "#2E9FDF", # Variables color
+  col.ind = "#696969") + 
+  labs(title="") + theme_biplot
+biplot_vitro
+```
+
+```{r index-17, eval=FALSE}
+biplot_vitro %>% 
+  ggsave(filename = "plots/biplot_vitro.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
+```
+
+![biplot_vitro.jpg](plots/biplot_vitro.jpg)
+
+SA y ABA van en misma direccion
+
+- Dendrograma
+
+```{r index-18, eval=FALSE}
 dendro_vitro <- vitro %>% 
   dist %>% hclust %>% as.dendrogram %>%
   set("branches_k_color", k = 5) %>% 
@@ -292,38 +311,17 @@ dendro_vitro <- vitro %>%
 dendro_vitro
 ```
 
-```{r, eval=FALSE}
+```{r index-19, eval=FALSE}
 ggsave(plot=dendro_vitro, filename = "plots/dendro_vitro.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
 ```
 
 ![dendro_vitro.jpg](plots/dendro_vitro.jpg)
-
--   Biplot
-
-```{r, results='hide', fig.cap="biplot_vitro"}
-vitro.pca <- PCA(vitro, scale.unit=TRUE, ncp=5, graph=F)
-biplot_vitro <- fviz_pca_biplot(vitro.pca, repel = TRUE,
-                                col.var = "#2E9FDF", # Variables color
-                                col.ind = "#696969"  # Individuals color
-                                ) + 
-  labs(title="") + theme_biplot
-biplot_vitro
-```
-
-```{r, eval=FALSE}
-biplot_vitro %>% 
-  ggsave(filename = "plots/biplot_vitro.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
-```
-
-![biplot_vitro.jpg](plots/biplot_vitro.jpg)
-
-SA y ABA van en misma direccion
+> 5 grupos de similiaridad multivariada en la produccion hormonal
 
 ### Tricho solo
 
-#### Multivar
 
-```{r}
+```{r index-20}
 tric_horm <- raw %>% #count(tipo)
   filter(tricho== "si" & rhizo=="no" | str_detect(cepa, "TA")) %>% 
   group_by(tipo, cepa, tricho, rhizo) %>%
@@ -339,17 +337,39 @@ tric_horm  %>%
   # mutate_if(is.numeric, round, 3) %>% 
   as_hux() %>% 
   set_font_size(9) %>%  
-  theme_article() -> tric_tab
-number_format(tric_tab)[, -1] <- 1
+  theme_compact() -> tric_tab
 number_format(tric_tab)[, -1] <- fmt_pretty()
-
 tric_tab
 ```
+#### Multivar
+
+-   Biplot
+
+```{r index-21, eval=F}
+trico_pca <- PCA(tric_horm, scale.unit=TRUE, ncp=5, graph=F)
+biplot_trico <- fviz_pca_biplot(
+  trico_pca, repel = TRUE,
+  col.var = "#2E9FDF", # Variables color
+  col.ind = "#696969") + 
+  labs(title="") + 
+  theme_biplot
+biplot_trico
+```
+
+```{r index-22, eval=FALSE}
+biplot_trico %>% 
+  ggsave(filename = "plots/trico_biplot.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
+```
+
+![trico_biplot.jpg](plots/trico_biplot.jpg) \### Tricho x rhizo
+
+> SA y AIA van en misma direccion
+> ABA en contra de AG3
 
 -   Dendrograma
 
-```{r, eval=FALSE}
-dendro_tric <- tric_horm %>% 
+```{r index-23, eval=FALSE}
+dendro_trico <- tric_horm %>% 
   dist %>% hclust %>% as.dendrogram %>%
   set("branches_k_color", k = 5) %>% 
   set("labels_cex", 0.6) %>% 
@@ -363,36 +383,17 @@ dendro_tric <- tric_horm %>%
        y = "Distancia Euclideana") +
   scale_y_continuous(position = "left") + 
   theme_dendro 
-dendro_tric
+dendro_trico
 ```
 
-```{r, eval=FALSE}
-ggsave(plot=dendro_tric, filename = "plots/dendro_tric.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
+```{r index-24, eval=FALSE}
+ggsave(plot=dendro_trico, 
+       filename = "plots/dendro_trico.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
 ```
 
-![dendro_tric.jpg](plots/dendro_tric.jpg)
+![dendro_trico.jpg](plots/dendro_trico.jpg)
 
--   Biplot
-
-```{r, results='hide', fig.cap="biplot_trico"}
-trico_pca <- PCA(tric_horm, scale.unit=TRUE, ncp=5, graph=F)
-biplot_trico <- fviz_pca_biplot(
-  trico_pca, repel = TRUE,
-  col.var = "#2E9FDF", # Variables color
-  col.ind = "#696969") + 
-  labs(title="") + 
-  theme_biplot
-biplot_trico
-```
-
-```{r, eval=FALSE}
-biplot_trico %>% 
-  ggsave(filename = "plots/trico_biplot.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
-```
-
-![trico_biplot.jpg](plots/trico_biplot.jpg) \### Tricho x rhizo
-
-```{r}
+```{r index-25}
 rhiz_horm <- raw %>% 
   select(-KIN) %>% 
   filter(str_detect(cepa, ("TA|RS"))|(tricho== "si" & rhizo=="si")) %>%
@@ -410,17 +411,39 @@ rhiz_horm %>%
   rownames_to_column("cepa") %>% 
   as_hux() %>% 
     set_font_size(9) %>%  
-  theme_article() -> rhiz_horm_tab
-number_format(rhiz_horm_tab)[, -1] <- 1 
+  theme_compact() -> rhiz_horm_tab
 number_format(rhiz_horm_tab)[, -1] <- fmt_pretty()
 rhiz_horm_tab
 ```
 
+### Tricho * Rhizo 
+
 #### Multivar
+
+- Biplot
+
+```{r index-26, eval=FALSE}
+rhiz_pca <- PCA(rhiz_horm, scale.unit=TRUE, ncp=5, graph=F)
+biplot_rhiz <- fviz_pca_biplot(rhiz_pca, repel = TRUE,
+                               col.var = "#2E9FDF", # Variables color
+                               col.ind = "#696969") +   
+  labs(title="") + 
+  theme_biplot
+biplot_rhiz
+```
+
+```{r index-27, eval=FALSE}
+biplot_rhiz %>% 
+  ggsave(filename = "plots/rhiz_sinCBK1_biplot.jpg", width = 4, height = 4, scale=1.2, 
+         dpi = 600)
+```
+![rhiz_sinCBK1_biplot.jpg](plots/rhiz_sinCBK1_biplot.jpg)
+
+AIA y SA van en misma direccion
 
 -   Dendro
 
-```{r, eval=FALSE}
+```{r index-28, eval=FALSE}
 rhiz_dendro <- rhiz_horm %>% 
   dist %>% hclust %>% as.dendrogram %>%
   set("branches_k_color", k = 5) %>% 
@@ -439,39 +462,20 @@ rhiz_dendro <- rhiz_horm %>%
 rhiz_dendro
 ```
 
-```{r, eval=FALSE}
-ggsave(plot=dendro_rhiz, filename = "plots/dendro_rhiz.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
+```{r index-29, eval=FALSE}
+ggsave(plot=dendro_rhiz, filename = "plots/rhiz_dendro.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
 ```
 
-![dendro_rhiz.jpg](plots/dendro_rhiz.jpg) - Biplot
+![rhiz_dendro.jpg](plots/rhiz_dendro.jpg) - Biplot
 
-```{r, results='hide', fig.cap="biplot_rhiz_sinCBK1", eval=FALSE}
-rhiz_pca <- PCA(rhiz_horm, scale.unit=TRUE, ncp=5, graph=F)
-biplot_rhiz <- fviz_pca_biplot(rhiz_pca, repel = TRUE,
-                               col.var = "#2E9FDF", # Variables color
-                               col.ind = "#696969") +   
-  labs(title="") + 
-  theme_biplot
-biplot_rhiz
-```
-
-```{r, eval=FALSE}
-biplot_rhiz %>% 
-  ggsave(filename = "plots/rhiz_sinCBK1_biplot.jpg", width = 4, height = 4, scale=1.2, 
-         dpi = 600)
-```
-
-![rhiz_sinCBK1_biplot.jpg](plots/rhiz_sinCBK1_biplot.jpg)
-
-AIA y SA van en misma direccion
 
 #### Univar
 
 The "BH" (aka "fdr") and "BY" methods of Benjamini, Hochberg, and Yekutieli control the false discovery rate, the expected proportion of false discoveries amongst the rejected hypotheses. The false discovery rate is a less stringent condition than the family-wise error rate, so these methods are more powerful than the others.
 
--   ABA
+##### ABA
 
-```{r}
+```{r index-30}
 raw %>% 
   unite(tipo, tipo, rhizo, tricho) %>%
   filter(str_detect(tipo, "vivo")) %>%
@@ -487,10 +491,10 @@ raw %>%
 # aba_cepa_dat %>% filter(cepa=="CBA3")
 ```
 
-```{r}
+```{r index-31}
 aba_cepa_dat %>% 
   ggplot() + 
-  aes(x=cepa, y=ABA) +
+  aes(x = reorder(cepa, ABA, FUN=median), y = ABA) +  
   labs(x= "", y="nanogramo/g de peso fresco", title= "ABA", subtitle = "Trichoderma spp. + Rhizoctonia solani")+
   stat_summary(fun.data = iqr, alpha=.5, col="red")+
   geom_jitter(width=.2, alpha=.5)+ 
@@ -498,7 +502,7 @@ aba_cepa_dat %>%
   coord_flip() 
 ```
 
-```{r}
+```{r index-32}
 aba_kw <- kwManyOneConoverTest(
   ABA ~ cepa, 
   data = aba_cepa_dat,
@@ -510,9 +514,9 @@ aba_kw %>% toTidy  %>%
   select(cepa=group1, statistic, p.value, dif_TA)
 ```
 
--   AG3
+##### AG3
 
-```{r}
+```{r index-33}
 raw %>% 
   unite(tipo, tipo, rhizo, tricho) %>%
   filter(str_detect(tipo, "vivo")) %>%
@@ -525,10 +529,10 @@ raw %>%
 # ag3_cepa_dat %>% count(tipo)
 ```
 
-```{r}
+```{r index-34}
 ag3_cepa_dat %>% 
   ggplot() + 
-  aes(x=cepa, y=AG3) + 
+  aes(x = reorder(cepa, AG3, FUN=median), y = AG3) +  
   labs(x= "", y="nanogramo/g de peso fresco", title= "AG3", subtitle = "Trichoderma spp. + Rhizoctonia solani")+
   stat_summary(fun.data = iqr, alpha=.5, col="red")+
   geom_jitter(width=.2, alpha=.5)+ 
@@ -536,7 +540,7 @@ ag3_cepa_dat %>%
   coord_flip()
 ```
 
-```{r}
+```{r index-35}
 ag3_kw <- kwManyOneConoverTest(
   AG3 ~ cepa, 
   data = ag3_cepa_dat,
@@ -549,9 +553,9 @@ ag3_kw %>%
   select(cepa=group1, statistic, p.value, dif_TA)
 ```
 
--   AIA
+##### AIA
 
-```{r}
+```{r index-36}
 raw %>% 
   unite(tipo, tipo, rhizo, tricho) %>%
   filter(str_detect(tipo, "vivo")) %>%
@@ -563,10 +567,10 @@ raw %>%
   drop_na(AIA) -> aia_cepa_dat
 ```
 
-```{r}
+```{r index-37}
 aia_cepa_dat %>% 
   ggplot() + 
-  aes(x=cepa, y=AIA) + 
+  aes(x = reorder(cepa, AIA, FUN=median), y = AIA) +
   labs(x= "", y="nanogramo/g de peso fresco", title= "AIA", subtitle = "Trichoderma spp. + Rhizoctonia solani")+
   stat_summary(fun.data = iqr, alpha=.5, col="red")+
   geom_jitter(width=.2, alpha=.5)+ 
@@ -574,7 +578,7 @@ aia_cepa_dat %>%
   coord_flip()
 ```
 
-```{r}
+```{r index-38}
 aia_kw <- kwManyOneConoverTest(
   AIA ~ cepa, 
   data = aia_cepa_dat,
@@ -588,9 +592,9 @@ aia_kw %>%
 
 ```
 
--   SA
+##### SA
 
-```{r}
+```{r index-39}
 raw %>% 
   unite(tipo, tipo, rhizo, tricho) %>%
   filter(str_detect(tipo, "vivo")) %>%
@@ -603,10 +607,10 @@ raw %>%
 # sa_cepa_dat %>% count(tipo)
 ```
 
-```{r}
+```{r index-40}
 sa_cepa_dat %>% 
   ggplot() + 
-  aes(x=cepa, y=SA) +
+  aes(x = reorder(cepa, SA, FUN=median), y = SA) +
   labs(x= "", y="nanogramo/g de peso fresco", title= "SA", subtitle = "Trichoderma spp. + Rhizoctonia solani")+
   stat_summary(fun.data = iqr, alpha=.5, col="red")+
   geom_jitter(width=.2, alpha=.5)+ 
@@ -614,7 +618,7 @@ sa_cepa_dat %>%
   coord_flip()
 ```
 
-```{r}
+```{r index-41}
 sa_kw <- kwManyOneConoverTest(
   SA ~ cepa, 
   data = sa_cepa_dat,
