@@ -1,4 +1,10 @@
-# Morfologia 
+---
+title: "Efecto sobre la Morfologia"
+---
+
+```{r setup, echo=FALSE}
+source(here::here("setup.R"))
+```
 
 ## Tricho solo
 
@@ -271,3 +277,4 @@ ggsave(plot=last_plot(), filename = "plots/hj_nuevas.jpg", width = 4, height = 4
 ```
 
 ![hj_nuevas.jpg](plots/hj_nuevas.jpg)
+

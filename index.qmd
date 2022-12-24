@@ -1,15 +1,10 @@
 ---
-title: "Cap. Hormonas trichoderma x rhizoctonia"
+title: "Cap. efecto de trichoderma x rhizoctonia en papa"
 subtitle: "Ultima actualizacion: `r format(Sys.time(), '%d/%m/%y')`"
 ---
 
-[Reporte](https://juanchiem.github.io/ale_tricho/)
-
-[Datos originales](https://docs.google.com/spreadsheets/d/1Qz-2UoqgL7Tiuz_04sY0tEdMdLqAzqr7QOg2Gg9jK_c/edit?usp=sharing)
-
-[Plots en calidad](https://github.com/juanchiem/tricho/tree/master/plots)
-
-```{r setup, child=c('setup.Rmd'), echo=FALSE}
+```{r setup, echo=FALSE}
+source(here::here("setup.R"))
 ```
 
 # Hormonas
@@ -632,5 +627,3 @@ sa_kw %>%
   select(cepa=group1, statistic, p.value, dif_TA)
 ```
 
-```{r, child=c('morfo.Rmd')}
-```

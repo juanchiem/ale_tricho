@@ -1,8 +1,6 @@
-```{r setup, echo=FALSE, warning = FALSE, message = FALSE}
-knitr::opts_chunk$set(echo = F, warning = FALSE, message = FALSE, 
-                      fig.height = 6, fig.width = 7)
+# Paquetes
 library(tidyverse) 
-library(ggdist) 
+# library(ggdist) 
 library(ggdendro) 
 library(dendextend) 
 library(FactoMineR) 
@@ -14,12 +12,15 @@ library(DescTools)
 conflicted::conflict_prefer("filter", "dplyr")
 conflicted::conflict_prefer("select", "dplyr")
 # conflicted::conflict_prefer("correlation", "correlation")
-source(here::here("shift_legend.R"))
-load("data/raw.rds")
+
+
+# Git config
 # usethis::use_git_config(user.name = "juanchiem", user.email = "edwardsmolina@gmail.com")
 # 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
 # install.packages("namer")
 
+# ggplot
+source(here::here("shift_legend.R"))
 theme_biplot <-  theme_minimal(12) +
   theme(axis.text.y = element_blank(),
         panel.grid.major.y = element_blank(),
@@ -40,6 +41,12 @@ theme_uni <- theme_minimal(12) +
   theme(panel.background = element_rect(fill = "white"),
         plot.background = element_rect(fill = "white"))
 
+
+theme_tricho <- theme_bw() +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank())
+
+
 options(scipen=999)
 
 # Define function to calculate IQR at given quantiles
@@ -51,19 +58,15 @@ iqr = function(z, lower = 0.25, upper = 0.75) {
   )
 }
 
-theme_tricho <- theme_bw() +
-  theme(panel.grid.minor.x = element_blank(),
-        panel.grid.minor.y = element_blank())
-```
+# Data
 
+load("data/raw.rds")
 
-```{r data, eval=FALSE}
-pacman::p_load(googlesheets4)
-url <- "https://docs.google.com/spreadsheets/d/1Qz-2UoqgL7Tiuz_04sY0tEdMdLqAzqr7QOg2Gg9jK_c/edit?usp=sharing" 
-gs4_deauth()
-excel <- url %>% gs4_get()
-excel %>% read_sheet()-> raw  
-save(raw, file = "data/raw.rds")
-raw %>% 
-  arrange(-ABA) %>% data.frame %>% head
-```
+# pacman::p_load(googlesheets4)
+# url <- "https://docs.google.com/spreadsheets/d/1Qz-2UoqgL7Tiuz_04sY0tEdMdLqAzqr7QOg2Gg9jK_c/edit?usp=sharing" 
+# gs4_deauth()
+# excel <- url %>% gs4_get()
+# excel %>% read_sheet()-> raw  
+# save(raw, file = "data/raw.rds")
+# raw %>% 
+#   arrange(-ABA) %>% data.frame %>% head
