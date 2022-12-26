@@ -1,5 +1,5 @@
 ---
-title: "Efecto sobre la Morfologia"
+title: "Morfologia de la planta"
 ---
 
 ```{r setup, echo=FALSE}
@@ -91,7 +91,6 @@ rhiz_morfo_pca <- PCA(rhiz_morfo, scale.unit=TRUE, ncp=5, graph=F)
 # summary(rhiz_morfo_pca)
 ```
 
-
 ```{r morfo-6, eval=FALSE}
 morfo_rhiz_biplot <- fviz_pca_biplot(
   rhiz_morfo_pca, repel = TRUE,
@@ -111,7 +110,7 @@ morfo_rhiz_biplot %>%
 ![morfo_rhiz_biplot.jpg](plots/morfo_rhiz_biplot.jpg)
 - Dendro
 
-```{r morfo-8, results='hide', fig.cap="dendro_rhiz_morfo"}
+```{r morfo-8, eval=FALSE}
 morfo_rhizo_dendro <- rhiz_morfo %>% 
   dist %>% hclust %>% as.dendrogram %>%
   set("branches_k_color", k = 5) %>% 
@@ -234,7 +233,7 @@ masa_dun$TA %>% as.data.frame %>%
 
 #### severidad
 
-```{r morfo-18, eval=FALSE}
+```{r morfo-18, eval=TRUE}
 rhiz %>%
   ggplot()+
   aes(x = reorder(cepa, -severidad, FUN=mean), y = severidad) +  
