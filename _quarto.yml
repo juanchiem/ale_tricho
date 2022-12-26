@@ -24,7 +24,7 @@ website:
 
     style: "docked"
     search: false
-    collapse-level: 4
+    collapse-level: 5
     contents:
       - href: index.qmd
         text: Hormonas
