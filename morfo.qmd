@@ -140,10 +140,17 @@ ggsave(plot=morfo_rhizo_dendro,
 
 ```{r morfo-10}
 rhiz <- raw %>%  
-  select(-tricho_rhizo) %>% 
-  filter(str_detect(cepa, ("TA|RS"))|(tricho== "si" & rhizo=="si")) %>% 
-  mutate(tub_masa = tub_peso*tub_n, .keep = "unused")   %>% 
-    mutate(cepa = fct_relevel(cepa, "TA")) 
+  # select(-tricho_rhizo) %>% 
+  # filter(str_detect(cepa, ("TA|RS"))|(tricho== "si" & rhizo=="si")) %>% 
+  filter(!str_detect(cepa, ("RS"))) %>%
+  filter(tipo!="vitro") %>%
+      mutate(tricho_rhizo = fct_recode(tricho_rhizo,
+                             "Testigo" = "no_no" ,
+                             "Trichoderma spp."= "si_no",
+                             "Trichoderma spp.\nRizoctonia sp." = "si_si"
+                             )) %>% 
+  mutate(tub_masa = tub_peso*tub_n, .keep = "unused")   
+  # mutate(cepa = fct_relevel(cepa, "TA"))
 # rhiz
 ```
 
@@ -153,41 +160,44 @@ rhiz <- raw %>%
 rhiz %>%   
   drop_na(raiz_largo) %>% 
   ggplot()+
-  aes(x = reorder(cepa, raiz_largo, FUN=mean), y = raiz_largo) +  
-  stat_summary(fun.y = mean, geom = "point",
-                  alpha=.5, col="red") + 
-  stat_summary(fun.data = mean_cl_boot, geom = "errorbar",
-               width = 0.2, alpha=.5, col="red") + 
+  aes(x = reorder(cepa, raiz_largo, FUN=mean), y = raiz_largo, col=tricho_rhizo ) +  
+  stat_summary(aes(col=tricho_rhizo),
+               fun = mean, geom = "crossbar", alpha=.5) + 
+  stat_summary(aes(col=tricho_rhizo), 
+               fun.data = mean_cl_boot, geom = "errorbar", width = 0.1, alpha=.5) + 
   geom_point(alpha=.5)+
   coord_flip() +
   theme_uni +
-  labs(x="", y="cm", title="Largo de raiz")
+  labs(x="", y="cm", title="Largo de raiz", col="")
 ```
 
 ```{r morfo-12, eval=FALSE}
-ggsave(plot=last_plot(), filename = "plots/rhizo_raiz_largo.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
+ggsave(plot=last_plot(), filename = "plots/rhizo_raiz_largo.jpg", 
+       width = 6, height =5, scale=1.2, dpi = 600)
 ```
-![rhizo_raiz_largo.jpg](plots/rhizo_raiz_largo.jpg)
 
+![rhizo_raiz_largo.jpg](plots/rhizo_raiz_largo.jpg)
 
 #### raiz_peso
 
 ```{r morfo-13, eval=FALSE}
-rhiz %>%
-  drop_na(raiz_largo) %>% 
+rhiz %>%   
+  drop_na(raiz_peso) %>% 
   ggplot()+
-  aes(x = reorder(cepa, raiz_peso, FUN=mean), y = raiz_peso) +    stat_summary(fun.y = mean, geom = "point",
-                  alpha=.5, col="red") + 
-  stat_summary(fun.data = mean_cl_boot, geom = "errorbar",
-               width = 0.2, alpha=.5, col="red") + 
+  aes(x = reorder(cepa, raiz_peso, FUN=mean), y = raiz_peso, col=tricho_rhizo ) +  
+  stat_summary(aes(col=tricho_rhizo),
+               fun = mean, geom = "crossbar", alpha=.5) + 
+  stat_summary(aes(col=tricho_rhizo), 
+               fun.data = mean_cl_boot, geom = "errorbar", width = 0.1, alpha=.5) + 
   geom_point(alpha=.5)+
   coord_flip() +
   theme_uni +
-    labs(x="", y="g", title="Peso de raiz")
+  labs(x="", y="cm", title="Peso de raiz", col="")
 ```
 
 ```{r morfo-14, eval=FALSE}
-ggsave(plot=last_plot(), filename = "plots/raiz_peso.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
+ggsave(plot=last_plot(), filename = "plots/raiz_peso.jpg",
+       width = 6, height =5, scale=1.2, dpi = 600)
 ```
 
 ![rhizo_raiz_largo.jpg](plots/rhizo_raiz_largo.jpg)
@@ -196,24 +206,24 @@ ggsave(plot=last_plot(), filename = "plots/raiz_peso.jpg", width = 4, height = 4
 #### tub_masa
 
 ```{r morfo-15, eval=FALSE}
-rhiz %>%
+rhiz %>%   
   drop_na(tub_masa) %>% 
-  # filter(cepa=="CBH4")
   ggplot()+
-  aes(x = reorder(cepa, tub_masa, FUN=mean), y = tub_masa) +  
-  stat_summary(fun.y = mean, geom = "point",
-                  alpha=.5, col="red") + 
-  stat_summary(fun.data = mean_cl_boot, geom = "errorbar",
-               width = 0.2, alpha=.5, col="red") + 
+  aes(x = reorder(cepa, tub_masa, FUN=mean), y = tub_masa, col=tricho_rhizo ) +  
+  stat_summary(aes(col=tricho_rhizo),
+               fun = mean, geom = "crossbar", alpha=.5) + 
+  stat_summary(aes(col=tricho_rhizo), 
+               fun.data = mean_cl_boot, geom = "errorbar", width = 0.1, alpha=.5) + 
   geom_point(alpha=.5)+
   coord_flip() +
   theme_uni +
-    labs(x="", y="g", title="Masa de tubérculos")
+  labs(x="", y="g", title="Masa de tubérculos",
 ```
 
 ```{r morfo-16, eval=FALSE}
 ggsave(plot=last_plot(), 
-       filename = "plots/rhizo_masa_tuber.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
+       filename = "plots/rhizo_masa_tuber.jpg", 
+       width = 6, height =5, scale=1.2, dpi = 600)
 ```
 
 ![rhizo_masa_tuber.jpg](plots/rhizo_masa_tuber.jpg)
@@ -237,13 +247,10 @@ masa_dun$TA %>% as.data.frame %>%
 rhiz %>%
   ggplot()+
   aes(x = reorder(cepa, -severidad, FUN=mean), y = severidad) +  
-  stat_summary(fun.y = mean, geom = "point",
-                  alpha=.5, col="red") + 
-  stat_summary(fun.data = mean_cl_boot, geom = "errorbar",
-               width = 0.2, alpha=.5, col="red") + 
-  geom_point(alpha=.5)+
-  coord_flip() +
-  theme_uni +
+
+  
+  
+  
     labs(x="", y= "Escala 1 a 5", title = "Severidad de rhizoctoniasis")
 ```
 

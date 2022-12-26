@@ -52,7 +52,7 @@ p2 <- raw %>%
                              "Testigo" = "vivo_no_no" ,
                              "Trichoderma spp."= "vivo_si_no",
                              "Trichoderma spp.\nRizoctonia sp." = "vivo_si_si"
-  )) %>% 
+                             )) %>% 
   filter(value<100000) %>% 
   ggplot() + 
   aes(x=id_exp, y=value)+
