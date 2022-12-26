@@ -138,7 +138,12 @@ krus_ag3$groups %>%
   rownames_to_column("tipo") %>% 
   left_join((ag_dat %>% 
                group_by(tipo) %>% 
-               summarise(median(AG3))))
+               summarise(median(AG3)))) %>% 
+  select(tipo, mediana=`median(AG3)`, groups) %>% 
+  as_hux() %>% 
+  theme_compact() -> krus_ag3_tab
+number_format(krus_ag3_tab)[,] <- fmt_pretty()
+krus_ag3_tab
 ```
 
 ### AIA
@@ -318,6 +323,7 @@ ggsave(plot=dendro_vitro, filename = "plots/dendro_vitro.jpg", width = 4, height
 ![dendro_vitro.jpg](plots/dendro_vitro.jpg)
 > 5 grupos de similiaridad multivariada en la produccion hormonal
 
+
 ### Tricho solo
 
 
@@ -466,8 +472,7 @@ rhiz_dendro
 ggsave(plot=dendro_rhiz, filename = "plots/rhiz_dendro.jpg", width = 4, height = 4, scale=1.2, dpi = 600)
 ```
 
-![rhiz_dendro.jpg](plots/rhiz_dendro.jpg) - Biplot
-
+![rhiz_dendro.jpg](plots/rhiz_dendro.jpg)
 
 #### Univar
 
