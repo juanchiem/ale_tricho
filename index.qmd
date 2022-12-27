@@ -525,7 +525,7 @@ aba_kw %>% toTidy  %>%
 raw %>% 
   unite(tipo, tipo, rhizo, tricho) %>%
   filter(str_detect(tipo, "vivo")) %>%
-  filter(!str_detect(tipo, "vivo_si_si")) %>%
+  filter(!str_detect(tipo, "vivo_no_si")) %>%
   filter(!str_detect(cepa, "RS")) %>%  
   select(tipo, cepa, AG3) %>% 
   mutate_at(vars(cepa), as.factor) %>% 
@@ -553,7 +553,7 @@ ag3_kw <- kwManyOneConoverTest(
 # summary(ag3_kw)
 
 ag3_kw %>% 
-  toTidy  %>% arrange(p.value) %>% 
+  toTidy %>% arrange(p.value) %>% 
   mutate(dif_TA=if_else(p.value < 0.1, "si", "no")) %>% 
   select(cepa=group1, statistic, p.value, dif_TA)
 ```
