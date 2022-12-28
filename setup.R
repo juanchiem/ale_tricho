@@ -72,7 +72,10 @@ load("data/raw.rds")
 #   arrange(-ABA) %>% data.frame %>% head
 
 # chunks names
-# library(namer)
-# name_chunks(here::here("index.qmd"))
-# name_chunks(here::here("morfo.qmd"))
+# install.packages("namer")
+
+# namer::name_chunks(here::here("index.qmd"))
+
+# namer::unname_chunks(here::here("morfo.qmd"))
+# namer::name_chunks(here::here("morfo.qmd"))
 
