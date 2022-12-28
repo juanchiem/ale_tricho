@@ -10,16 +10,17 @@ website:
   
   sidebar:
     pinned: true
+    title: ""
     align: center
     tools: 
-      - icon: database
+      - icon: database-fill
         href: https://docs.google.com/spreadsheets/d/1Qz-2UoqgL7Tiuz_04sY0tEdMdLqAzqr7QOg2Gg9jK_c/edit?usp=sharing        
         text: "Data"
       - icon: github
         href: https://github.com/openscapes/quarto-website-tutorial
         text: "Repo"
       - icon: image
-        href: https://github.com/juanchiem/tricho/tree/master/plots
+        href: https://github.com/juanchiem/ale_tricho/tree/main/plots
         text: "Figuras"         
 
     style: "docked"

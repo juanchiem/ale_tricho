@@ -519,6 +519,12 @@ aba_kw %>% toTidy  %>%
   select(cepa=group1, statistic, p.value, dif_TA)
 ```
 
+```{r}
+
+```
+
+
+
 ##### AG3
 
 ```{r index-33}
