@@ -9,6 +9,8 @@ library(agricolae)
 library(huxtable) 
 library(PMCMRplus)
 library(DescTools)
+library(emmeans)
+
 conflicted::conflict_prefer("filter", "dplyr")
 conflicted::conflict_prefer("select", "dplyr")
 # conflicted::conflict_prefer("correlation", "correlation")
