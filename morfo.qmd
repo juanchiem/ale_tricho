@@ -200,13 +200,14 @@ mod_raiz <- lm(sqrt(raiz_largo+0.1) ~ cepa, rhiz_raiz)
 performance::check_normality(mod_raiz)
 performance::check_heteroscedasticity(mod_raiz)
 
-emm1 = emmeans(mod_raiz, "cepa", type="response")
-
-contrast(emm1, "trt.vs.ctrl1") %>% 
+emmeans(mod_raiz, "cepa", type="response") %>% 
+  contrast(., "trt.vs.ctrl1") %>% 
   tidy %>%  
   arrange(adj.p.value) %>% 
-  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no")) %>% 
-  mutate(dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) 
+  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no"),
+         dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
+  hux %>% 
+  theme_compact()
 ```
 
 
@@ -232,11 +233,34 @@ ggsave(plot=last_plot(), filename = "plots/raiz_peso.jpg",
        width = 6, height =5, scale=1.2, dpi = 600)
 ```
 
-![rhizo_raiz_peso.jpg](plots/rhizo_raiz_peso.jpg)
+![raiz_peso.jpg](plots/raiz_peso.jpg)
+
+
+```{r morfo-16}
+raw %>%
+  drop_na(raiz_peso) %>% 
+  mutate_at(vars(cepa), as.factor) %>% 
+  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
+  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_raiz_peso
+
+mod_raiz_peso <- lm(log(raiz_peso+0.5)~ cepa, rhiz_raiz_peso)
+performance::check_normality(mod_raiz_peso)
+performance::check_heteroscedasticity(mod_raiz_peso)
+
+emmeans(mod_raiz_peso, "cepa", type="response") %>% 
+  contrast(., "trt.vs.ctrl1") %>% 
+  tidy %>%  
+  arrange(adj.p.value) %>% 
+  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no"),
+         dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
+  hux %>% 
+  theme_compact()
+
+```
 
 #### tub_n
 
-```{r morfo-16, eval=FALSE}
+```{r morfo-17, eval=FALSE}
 rhiz %>%   
   drop_na(tub_n) %>% 
   ggplot()+
@@ -251,7 +275,7 @@ rhiz %>%
   labs(x="", y="", title="Cantidad de tubérculos", col="")
 ```
 
-```{r morfo-17, eval=FALSE}
+```{r morfo-18, eval=FALSE}
 ggsave(plot=last_plot(), 
        filename = "plots/rhizo_tuber_n.jpg", 
        width = 6, height =5, scale=1.2, dpi = 600)
@@ -261,7 +285,7 @@ ggsave(plot=last_plot(),
 
 #### tub_peso
 
-```{r morfo-18, eval=FALSE}
+```{r morfo-19, eval=FALSE}
 rhiz %>%  
   # names
   drop_na(tub_peso) %>% 
@@ -277,7 +301,7 @@ rhiz %>%
   labs(x="", y="g", title="Peso de cada tubérculo", col="")
 ```
 
-```{r morfo-19, eval=FALSE}
+```{r morfo-20, eval=FALSE}
 ggsave(plot=last_plot(), 
        filename = "plots/rhizo_tuber_peso.jpg", 
        width = 6, height =5, scale=1.2, dpi = 600)
@@ -287,7 +311,7 @@ ggsave(plot=last_plot(),
 
 #### tub_masa
 
-```{r morfo-20, eval=FALSE}
+```{r morfo-21, eval=FALSE}
 rhiz %>%  
   # names
   drop_na(tub_masa) %>% 
@@ -303,7 +327,7 @@ rhiz %>%
   labs(x="", y="g", title="Masa total de tubérculo por planta", col="")
 ```
 
-```{r morfo-21, eval=FALSE}
+```{r morfo-22, eval=FALSE}
 ggsave(plot=last_plot(), 
        filename = "plots/rhizo_tuber_masa.jpg", 
        width = 6, height =5, scale=1.2, dpi = 600)
@@ -311,7 +335,7 @@ ggsave(plot=last_plot(),
 
 ![rhizo_tuber_masa.jpg](plots/rhizo_tuber_masa.jpg)
 
-```{r morfo-22 }
+```{r morfo-23 }
 raw %>%
   mutate(tub_masa = tub_peso*tub_n, .keep = "unused") %>% 
   drop_na(tub_masa) %>% 
@@ -336,8 +360,9 @@ contrast(emm_masa, "trt.vs.ctrl1") %>%
 
 #### altura_pl
 
-```{r morfo-23, eval=FALSE}
+```{r morfo-24, eval=FALSE}
 rhiz %>%
+  mutate(altura_pl = na_if(altura_pl, 0)) %>% 
   ggplot()+
   aes(x = reorder(cepa, altura_pl, FUN=mean), y = altura_pl, col=tricho_rhizo) +
   stat_summary(aes(col=tricho_rhizo),
@@ -350,16 +375,38 @@ rhiz %>%
     labs(x="", y="cm", title="Altura de planta", col="")
 ```
 
-```{r morfo-24, eval=FALSE}
+```{r morfo-25, eval=FALSE}
 ggsave(plot=last_plot(), filename = "plots/altura_pl.jpg", 
        width = 6, height =5, scale=1.2, dpi = 600)
 ```
 
 ![altura_pl.jpg](plots/altura_pl.jpg)
 
+```{r morfo-26 }
+raw %>% 
+  mutate(altura_pl = na_if(altura_pl, 0)) %>% 
+  drop_na(altura_pl) %>% 
+  mutate_at(vars(cepa), as.factor) %>% 
+  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
+  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_alt
+
+mod_altura <- lm(sqrt(altura_pl) ~ cepa, rhiz_alt)
+performance::check_normality(mod_altura)
+performance::check_heteroscedasticity(mod_altura)
+
+emmeans(mod_altura, "cepa", type="response") %>% 
+  contrast(., "trt.vs.ctrl1") %>% 
+  tidy %>%  
+  arrange(adj.p.value) %>% 
+  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no"),
+         dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
+  hux %>% 
+  theme_compact()
+```
+
 #### n_hj
 
-```{r morfo-25, eval=FALSE}
+```{r morfo-27, eval=FALSE}
 rhiz %>%
   drop_na(n_hn) %>% 
   ggplot()+
@@ -374,7 +421,7 @@ rhiz %>%
   labs(x="", title = "Hojas nuevas", y = "Cantidad de hojas", col="")
 ```
 
-```{r morfo-26, eval=FALSE}
+```{r morfo-28, eval=FALSE}
 ggsave(plot=last_plot(), filename = "plots/hj_nuevas.jpg", 
        width = 6, height =5, scale=1.2, dpi = 600)
 ```
@@ -383,7 +430,7 @@ ggsave(plot=last_plot(), filename = "plots/hj_nuevas.jpg",
 
 #### severidad
 
-```{r morfo-27, eval=TRUE}
+```{r morfo-29, eval=TRUE}
 rhiz %>%
   filter((tricho== "si" & rhizo=="si")) %>%
   ggplot()+
@@ -397,9 +444,30 @@ rhiz %>%
   labs(x="", y= "Escala 1 a 5", title = "Severidad de rhizoctoniasis")
 ```
 
-```{r morfo-28, eval=FALSE}
+```{r morfo-30, eval=FALSE}
 ggsave(plot=last_plot(), 
        filename = "plots/severidad.jpg", width = 4, height = 4, scale=1.2, 
        dpi = 600)
 ```
 
+```{r morfo-31 }
+raw %>% 
+  # mutate(altura_pl = na_if(altura_pl, 0)) %>% 
+  drop_na(severidad) %>% 
+  mutate_at(vars(cepa), as.factor) %>% 
+  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
+  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_sev
+
+mod_sev <- lm(severidad ~ cepa, rhiz_sev)
+performance::check_normality(mod_sev)
+performance::check_heteroscedasticity(mod_sev)
+
+emmeans(mod_sev, "cepa", type="response") %>% 
+  contrast(., "trt.vs.ctrl1") %>% 
+  tidy %>%  
+  arrange(adj.p.value) %>% 
+  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no"),
+         dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
+  hux %>% 
+  theme_compact()
+```
