@@ -1,6 +1,6 @@
 ---
-title: "Cap. efecto de trichoderma x rhizoctonia en papa"
-subtitle: "Ultima actualizacion: `r format(Sys.time(), '%d/%m/%y')`"
+title: "Trichoderma x rhizoctonia en papa"
+subtitle: "Ultima actualizacion: `r format(Sys.time(), c('%d/%m/%y','%H:%M'))`"
 ---
 
 ```{r setup, echo=FALSE}

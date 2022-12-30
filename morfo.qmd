@@ -6,7 +6,7 @@ title: "Morfologia de la planta"
 source(here::here("setup.R"))
 ```
 
-## Tricho solo
+## Tricho solo multivar
 
 ```{r morfo-1 }
 tric_morfo <- raw %>% #count(tipo)
@@ -57,7 +57,7 @@ morfo_trico_biplot %>%
 
 > La variables de parte subterranea van en misma direccion, lo mismo altura y nro de hojas nuevas.
 
-## Tricho x Rhizo 
+## Tricho x Rhizo multivar
 
 ```{r morfo-4 }
 rhiz_morfo <- raw %>% #count(tipo)
@@ -147,7 +147,8 @@ raw %>%
   arrange(r)
 ```
 
-### Subterranea
+## Univariado
+
 
 ```{r morfo-10 }
 rhiz <- raw %>%  
@@ -165,7 +166,7 @@ rhiz <- raw %>%
 # rhiz
 ```
 
-#### raiz_largo
+### raiz_largo
 
 ```{r morfo-11, eval=FALSE}
 rhiz %>%   
@@ -189,29 +190,7 @@ ggsave(plot=last_plot(), filename = "plots/rhizo_raiz_largo.jpg",
 
 ![rhizo_raiz_largo.jpg](plots/rhizo_raiz_largo.jpg)
 
-```{r morfo-13 }
-raw %>%
-  drop_na(raiz_largo) %>% 
-  mutate_at(vars(cepa), as.factor) %>% 
-  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
-  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_raiz
-
-mod_raiz <- lm(sqrt(raiz_largo+0.1) ~ cepa, rhiz_raiz)
-performance::check_normality(mod_raiz)
-performance::check_heteroscedasticity(mod_raiz)
-
-emmeans(mod_raiz, "cepa", type="response") %>% 
-  contrast(., "trt.vs.ctrl1") %>% 
-  tidy %>%  
-  arrange(adj.p.value) %>% 
-  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no"),
-         dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
-  hux %>% 
-  theme_compact()
-```
-
-
-##### Solo tricho 
+#### Tricho solo
 
 ```{r morfo-14 }
 raw %>%
@@ -234,9 +213,30 @@ emmeans(mod_raiz_tricho, "cepa", type="response") %>%
   theme_compact()
 ```
 
+#### Tricho x Rhizo
 
+```{r morfo-13 }
+raw %>%
+  drop_na(raiz_largo) %>% 
+  mutate_at(vars(cepa), as.factor) %>% 
+  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
+  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_raiz
 
-#### raiz_peso
+mod_raiz <- lm(sqrt(raiz_largo+0.1) ~ cepa, rhiz_raiz)
+performance::check_normality(mod_raiz)
+performance::check_heteroscedasticity(mod_raiz)
+
+emmeans(mod_raiz, "cepa", type="response") %>% 
+  contrast(., "trt.vs.ctrl1") %>% 
+  tidy %>%  
+  arrange(adj.p.value) %>% 
+  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no"),
+         dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
+  hux %>% 
+  theme_compact()
+```
+
+### raiz_peso
 
 ```{r morfo-15, eval=FALSE}
 rhiz %>%   
@@ -260,6 +260,7 @@ ggsave(plot=last_plot(), filename = "plots/raiz_peso.jpg",
 
 ![raiz_peso.jpg](plots/raiz_peso.jpg)
 
+#### Tricho x Rhizo
 
 ```{r morfo-17 }
 raw %>%
@@ -280,10 +281,9 @@ emmeans(mod_raiz_peso, "cepa", type="response") %>%
          dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
   hux %>% 
   theme_compact()
-
 ```
 
-#### tub_n
+### tub_n
 
 ```{r morfo-18, eval=FALSE}
 rhiz %>%   
@@ -308,7 +308,7 @@ ggsave(plot=last_plot(),
 
 ![rhizo_tuber_n.jpg](plots/rhizo_tuber_n.jpg)
 
-#### tub_peso
+### tub_peso
 
 ```{r morfo-20, eval=FALSE}
 rhiz %>%  
@@ -334,7 +334,7 @@ ggsave(plot=last_plot(),
 
 ![rhizo_tuber_peso.jpg](plots/rhizo_tuber_peso.jpg)
 
-#### tub_masa
+### tub_masa
 
 ```{r morfo-22, eval=FALSE}
 rhiz %>%  
@@ -360,28 +360,7 @@ ggsave(plot=last_plot(),
 
 ![rhizo_tuber_masa.jpg](plots/rhizo_tuber_masa.jpg)
 
-```{r morfo-24 }
-raw %>%
-  mutate(tub_masa = tub_peso*tub_n, .keep = "unused") %>% 
-  drop_na(tub_masa) %>% 
-  mutate_at(vars(cepa), as.factor) %>% 
-  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
-  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_tub
-
-mod_masa <- lm(sqrt(tub_masa+0.1) ~ cepa, rhiz_tub)
-performance::check_normality(mod_masa)
-performance::check_heteroscedasticity(mod_masa)
-
-emm_masa = emmeans(mod_masa, "cepa", type="response")
-
-contrast(emm_masa, "trt.vs.ctrl1") %>% 
-  tidy %>%  
-  arrange(adj.p.value) %>% 
-  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no")) %>% 
-  mutate(dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) 
-```
-
-##### Solo tricho 
+#### Tricho solo 
 
 ```{r morfo-25 }
 raw %>%
@@ -405,9 +384,32 @@ emmeans(mod_tubmasa_tricho, "cepa", type="response") %>%
   theme_compact()
 ```
 
-### Aerea
+#### Tricho x Rhizo
 
-#### altura_pl
+```{r morfo-24 }
+raw %>%
+  mutate(tub_masa = tub_peso*tub_n, .keep = "unused") %>% 
+  drop_na(tub_masa) %>% 
+  mutate_at(vars(cepa), as.factor) %>% 
+  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
+  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_tub
+
+mod_masa <- lm(sqrt(tub_masa+0.1) ~ cepa, rhiz_tub)
+performance::check_normality(mod_masa)
+performance::check_heteroscedasticity(mod_masa)
+
+emm_masa = emmeans(mod_masa, "cepa", type="response")
+
+contrast(emm_masa, "trt.vs.ctrl1") %>% 
+  tidy %>%  
+  arrange(adj.p.value) %>% 
+  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no")) %>% 
+  mutate(dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
+  hux %>% 
+  theme_compact()
+```
+
+### altura_pl
 
 ```{r morfo-26, eval=FALSE}
 rhiz %>%
@@ -430,28 +432,6 @@ ggsave(plot=last_plot(), filename = "plots/altura_pl.jpg",
 ```
 
 ![altura_pl.jpg](plots/altura_pl.jpg)
-
-```{r morfo-28 }
-raw %>% 
-  mutate(altura_pl = na_if(altura_pl, 0)) %>% 
-  drop_na(altura_pl) %>% 
-  mutate_at(vars(cepa), as.factor) %>% 
-  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
-  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_alt
-
-mod_altura <- lm(sqrt(altura_pl) ~ cepa, rhiz_alt)
-performance::check_normality(mod_altura)
-performance::check_heteroscedasticity(mod_altura)
-
-emmeans(mod_altura, "cepa", type="response") %>% 
-  contrast(., "trt.vs.ctrl1") %>% 
-  tidy %>%  
-  arrange(adj.p.value) %>% 
-  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no"),
-         dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
-  hux %>% 
-  theme_compact()
-```
 
 ##### Solo tricho 
 
@@ -476,8 +456,31 @@ emmeans(mod_altura_tricho, "cepa", type="response") %>%
   theme_compact()
 ```
 
+#### Tricho x Rhizo
 
-#### n_hj
+```{r morfo-28 }
+raw %>% 
+  mutate(altura_pl = na_if(altura_pl, 0)) %>% 
+  drop_na(altura_pl) %>% 
+  mutate_at(vars(cepa), as.factor) %>% 
+  mutate(cepa = fct_relevel(cepa, "TA")) %>% 
+  filter(str_detect(cepa,"TA")|tricho_rhizo =="si_si") -> rhiz_alt
+
+mod_altura <- lm(sqrt(altura_pl) ~ cepa, rhiz_alt)
+performance::check_normality(mod_altura)
+performance::check_heteroscedasticity(mod_altura)
+
+emmeans(mod_altura, "cepa", type="response") %>% 
+  contrast(., "trt.vs.ctrl1") %>% 
+  tidy %>%  
+  arrange(adj.p.value) %>% 
+  mutate(dif_TA_5=if_else(adj.p.value < 0.05, "si", "no"),
+         dif_TA_10=if_else(adj.p.value < 0.1, "si", "no")) %>% 
+  hux %>% 
+  theme_compact()
+```
+
+### n_hj
 
 ```{r morfo-30, eval=FALSE}
 rhiz %>%

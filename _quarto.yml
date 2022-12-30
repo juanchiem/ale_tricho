@@ -10,7 +10,7 @@ website:
   
   sidebar:
     pinned: true
-    title: ""
+    title: "Inicio"
     align: center
     tools: 
       - icon: database-fill
