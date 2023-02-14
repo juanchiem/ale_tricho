@@ -149,6 +149,17 @@ raw %>%
 
 ## Univariado
 
+Con el fin de comparar el efecto de las cepas de trichoderma sobre variables morfologicas de las plantas de papa se ajustaron modelos lineales, los cuales deben cumplir los supuestos de homogeneidad de varianza a traves de los distintos grupos o tratamientos y la normalidad de los residuales del modelo. En caso del no cumplimiento de algunos de estos supuestos, fueron realizadas transformaciones sobre las variables respuesta.  
+
+En caso de obtener efecto significativo de la cepa, se realizó un test de Dunnet que confronta cada cepa vs el testigo absoluto, denominado "TA", identificando asi a las plantas sin infeccion por parte de Rhizoctonia sp ni cepas de trichoderma spp. 
+
+Todo el flujo de trabajo (consolidacion de base de datos, visualización y modelado) fue realizado con el software R (R Core Team, 2018) y los paquetes "tidyverse", "emmeans", "performance". 
+
+```{r}
+citation()
+```
+
+### rhiz dataset
 
 ```{r morfo-10 }
 rhiz <- raw %>%  
@@ -507,8 +518,8 @@ ggsave(plot=last_plot(), filename = "plots/hj_nuevas.jpg",
 #### severidad
 
 ```{r morfo-32, eval=TRUE}
-rhiz %>%
-  filter((tricho== "si" & rhizo=="si")) %>%
+rhiz %>% 
+  # filter((tricho== "si" & rhizo=="si")) %>%
   ggplot()+
   aes(x = reorder(cepa, -severidad, FUN=mean), 
       y = severidad) +  
@@ -517,7 +528,7 @@ rhiz %>%
   geom_point(alpha=.5)+
   coord_flip() +
   theme_uni +
-  labs(x="", y= "Escala 1 a 5", title = "Severidad de rhizoctoniasis")
+  labs(x="", y= "Escala 1 a 4", title = "Severidad de rhizoctoniasis")
 ```
 
 ```{r morfo-33, eval=FALSE}
